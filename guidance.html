@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profitability Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #0d341c, #5eb4a2);
+      color: #2d4739;
+    }
+
+    header {
+      background: linear-gradient(to right, #13562f, #229954);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    section {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgb(200, 225, 223);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      color: #239b56;
+    }
+
+    a {
+      color: #1abc9c;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #2ecc71;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #27ae60;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    ul {
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌿 Profitability Calculator</h1>
+  </header>
+
+  <!-- Section 1: Guidance -->
+  <section>
+    <div class="card">
+      <h2>📘 Financial Guidance</h2>
+      <ul>
+        <li><a href="https://www.investopedia.com/budgeting-4689740" target="_blank">How to Create a Budget</a></li>
+        <li><a href="https://www.nerdwallet.com/article/finance/how-to-save-money" target="_blank">Money Saving Tips</a></li>
+        <li><a href="https://www.investopedia.com/terms/i/investing.asp" target="_blank">Basics of Investing</a></li>
+        <li><a href="https://www.investopedia.com/articles/pf/06/compoundinterest.asp" target="_blank">Compound Interest Explained</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>🏡 Government Subsidies for Farmers</h2>
+      <ul>
+        <li><a href="https://pmkisan.gov.in/" target="_blank">PM-Kisan Samman Nidhi Yojana</a></li>
+        <li><a href="https://agricoop.gov.in/en/Major#gsc.tab=0" target="_blank">Subsidy Schemes by Ministry of Agriculture</a></li>
+        <li><a href="https://niti.gov.in/agriculture-sector-schemes" target="_blank">NITI Aayog Agricultural Schemes</a></li>
+        <li><a href="https://www.kvkcard.org/" target="_blank">KVK Agricultural Support</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Section 2: Profit & Loss Calculator -->
+  <section>
+    <div class="card">
+      <h2>📊 Advanced Profitability Calculator</h2>
+
+      <label for="land">Land Size (in acres):</label>
+      <input type="number" id="land" placeholder="e.g. 2">
+
+      <label for="yield">Yield per acre (in kg):</label>
+      <input type="number" id="yield" placeholder="e.g. 500">
+
+      <label for="price">Market Price per kg (₹):</label>
+      <input type="number" id="price" placeholder="e.g. 15">
+
+      <label for="cost">Total Cost of Cultivation (₹):</label>
+      <input type="number" id="cost" placeholder="e.g. 12000">
+
+      <button onclick="calculate()">Calculate Profit or Loss</button>
+      <div id="result"></div>
+    </div>
+  </section>
+
+  <script>
+    function calculate() {
+      const land = parseFloat(document.getElementById('land').value);
+      const yieldPerAcre = parseFloat(document.getElementById('yield').value);
+      const pricePerKg = parseFloat(document.getElementById('price').value);
+      const totalCost = parseFloat(document.getElementById('cost').value);
+      const result = document.getElementById('result');
+
+      if (isNaN(land) || isNaN(yieldPerAcre) || isNaN(pricePerKg) || isNaN(totalCost)) {
+        result.innerHTML = "⚠️ Please fill in all fields with valid numbers.";
+        result.style.color = "red";
+        return;
+      }
+
+      const totalProduction = land * yieldPerAcre;
+      const totalRevenue = totalProduction * pricePerKg;
+      const net = totalRevenue - totalCost;
+
+      let message = `
+        🌾 Total Production: ${totalProduction.toFixed(2)} kg<br>
+        💰 Total Revenue: ₹${totalRevenue.toFixed(2)}<br>
+        🧾 Total Cost: ₹${totalCost.toFixed(2)}<br>
+      `;
+
+      if (net > 0) {
+        message += `<span style="color:green;">✅ Profit: ₹${net.toFixed(2)}</span>`;
+      } else if (net < 0) {
+        message += `<span style="color:red;">❌ Loss: ₹${Math.abs(net).toFixed(2)}</span>`;
+      } else {
+        message += `<span style="color:gray;">😐 No Profit No Loss.</span>`;
+      }
+
+      result.innerHTML = message;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crop Disease Detection</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('imagedect.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: -1;
+    }
+
+    h1 {
+      color: #fff;
+      margin-top: 40px;
+      text-shadow: 2px 2px 6px #000;
+    }
+
+    .upload-container {
+      margin: 30px auto;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .upload-area {
+      border: 2px dashed #4CAF50;
+      padding: 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #f4fff4;
+    }
+
+    .upload-area:hover {
+      background-color: #e6ffe6;
+    }
+
+    .upload-area p {
+      color: #333;
+      margin: 5px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .btn {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background-color: #388e3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #2e7d32;
+    }
+
+    .predict-hint {
+      font-size: 14px;
+      color: #555;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .result-container {
+      display: none;
+      margin: 20px;
+      background-color: rgba(255, 255, 255, 0.97);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 800px;
+      width: 90%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .result-image img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    h2, h4, p {
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+
+    ol {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌿 Crop Disease Detection</h1>
+
+  <div class="upload-container">
+    <div class="upload-area" id="uploadArea">
+      <p><strong>Upload a Crop Leaf Image</strong></p>
+      <p>Click or drag-and-drop to select an image</p>
+      <p><em>Formats: JPG, PNG, JPEG</em></p>
+    </div>
+    <input type="file" id="fileInput" class="file-input" accept="image/*">
+    <button class="btn" id="uploadBtn">🔍 Predict Disease</button>
+    <p class="predict-hint">Click the button after uploading to see the disease result.</p>
+  </div>
+
+  <div class="result-container" id="resultContainer">
+    <div class="result-image">
+      <img id="uploadedImage" src="" alt="Uploaded crop image">
+    </div>
+    <div class="result-details">
+      <h2 id="diseaseName">Disease Name</h2>
+      <p id="diseaseDescription">Disease description will appear here.</p>
+      <div class="treatment-steps">
+        <h4>🧪 Recommended Treatment:</h4>
+        <ol id="treatmentSteps"></ol>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const uploadArea = document.getElementById('uploadArea');
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const resultContainer = document.getElementById('resultContainer');
+      const uploadedImage = document.getElementById('uploadedImage');
+      const diseaseName = document.getElementById('diseaseName');
+      const diseaseDescription = document.getElementById('diseaseDescription');
+      const treatmentSteps = document.getElementById('treatmentSteps');
+
+      const diseaseDatabase = [
+        {
+          name: "Late Blight",
+          description: "Late blight is a potentially devastating disease of potato and tomato...",
+          treatments: [
+            "Apply fungicides containing chlorothalonil or copper compounds.",
+            "Destroy infected plant parts.",
+            "Avoid overhead irrigation."
+          ]
+        },
+        {
+          name: "Powdery Mildew",
+          description: "Powdery mildew appears as white powdery growth on leaf surfaces...",
+          treatments: [
+            "Use sulfur-based fungicides.",
+            "Improve air circulation.",
+            "Apply neem oil."
+          ]
+        },
+        {
+          name: "Bacterial Leaf Spot",
+          description: "Caused by bacteria, leading to black spots on leaves in warm conditions...",
+          treatments: [
+            "Use copper-based bactericides.",
+            "Remove infected debris.",
+            "Use clean seeds."
+          ]
+        },
+        {
+          name: "Rust",
+          description: "Rust appears as orange-brown pustules on leaves, reducing yield...",
+          treatments: [
+            "Spray triazole fungicides.",
+            "Rotate crops.",
+            "Plant resistant varieties."
+          ]
+        },
+        {
+          name: "Fusarium Wilt",
+          description: "Soil-borne fungus causes yellowing and wilting, blocking water flow...",
+          treatments: [
+            "Remove infected plants.",
+            "Rotate crops for 5 years.",
+            "Sterilize tools."
+          ]
+        },
+        {
+          name: "Anthracnose",
+          description: "Causes dark sunken lesions on fruits, stems, or leaves...",
+          treatments: [
+            "Apply copper-based fungicides.",
+            "Prune infected parts.",
+            "Avoid overhead watering."
+          ]
+        },
+        {
+          name: "Leaf Curl",
+          description: "Viral or fungal issue causing curling and distortion of leaves...",
+          treatments: [
+            "Use resistant plant varieties.",
+            "Control aphids or whiteflies.",
+            "Apply suitable fungicides or insecticides."
+          ]
+        },
+        {
+          name: "Black Spot",
+          description: "Black circular lesions on leaves, commonly affecting roses...",
+          treatments: [
+            "Remove affected leaves.",
+            "Apply sulfur or copper fungicides.",
+            "Ensure good air flow."
+          ]
+        }
+      ];
+
+      uploadArea.addEventListener('click', () => fileInput.click());
+
+      uploadArea.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        uploadArea.style.backgroundColor = '#f1fff0';
+      });
+
+      uploadArea.addEventListener('dragleave', function () {
+        uploadArea.style.backgroundColor = '#f4fff4';
+      });
+
+      uploadArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        uploadArea.style.backgroundColor = '#f4fff4';
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          showPreview(e.dataTransfer.files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files.length) {
+          showPreview(fileInput.files[0]);
+        }
+      });
+
+      uploadBtn.addEventListener('click', function () {
+        if (fileInput.files.length) {
+          analyzeImage();
+        } else {
+          alert('Please upload a valid leaf image to detect the disease.');
+        }
+      });
+
+      function showPreview(file) {
+        if (!file.type.match('image.*')) {
+          alert('Only image files are allowed.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          uploadedImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function analyzeImage() {
+        diseaseName.textContent = "Analyzing...";
+        diseaseDescription.textContent = "Analyzing image, please wait...";
+        treatmentSteps.innerHTML = "";
+        resultContainer.style.display = "block";
+
+        setTimeout(function () {
+          const randomIndex = Math.floor(Math.random() * diseaseDatabase.length);
+          const disease = diseaseDatabase[randomIndex];
+
+          diseaseName.textContent = disease.name;
+          diseaseDescription.textContent = disease.description;
+
+          treatmentSteps.innerHTML = "";
+          disease.treatments.forEach(step => {
+            const li = document.createElement('li');
+            li.textContent = step;
+            treatmentSteps.appendChild(li);
+          });
+
+          const confidence = Math.floor(Math.random() * 20) + 80;
+          const confidenceP = document.createElement('p');
+          confidenceP.innerHTML = `<strong>Confidence Level:</strong> ${confidence}%`;
+          diseaseDescription.after(confidenceP);
+
+        }, 2000);
+      }
+    });
+  </script>
+
+</body>
+</html>

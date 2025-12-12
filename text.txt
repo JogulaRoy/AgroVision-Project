@@ -1,0 +1,5 @@
+uvicorn main:app --reload
+
+
+-- to install --
+pip install fastapi uvicorn

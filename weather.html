@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Forecast</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-image: url(piccc.jpg);
+      
+
+    
+      height: 100vh;
+      width: 100vw;
+      
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 80px;
+      color: white;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px 35px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .search {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .search input {
+      flex: 1;
+      padding: 10px 25px;
+      height: 60px;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      background: #ebfffc;
+      color: #333;
+      font-size: 18px;
+    }
+
+    .search button {
+      padding: 10px 20px;
+      height: 60px;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      background: #ebfffc;
+      color: #333;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .search button:hover {
+      background: #d4f1ee;
+    }
+
+    .weather {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .weather-icon {
+      width: 170px;
+      margin-top: 10px;
+    }
+
+    .weather h1 {
+      font-size: 60px;
+      font-weight: 500;
+      margin: 10px 0;
+    }
+
+    .weather h2 {
+      font-size: 35px;
+      font-weight: 400;
+      margin-top: -10px;
+    }
+
+    .details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      padding: 0 10px;
+    }
+
+    .col {
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+
+    .col img {
+      width: 40px;
+      margin-right: 10px;
+    }
+
+    .humidity, .wind {
+      font-size: 20px;
+      margin-top: -6px;
+    }
+  </style>
+</head>
+<body><div class="container">
+  <h1 style="text-align: center; margin-bottom: 20px;">Weather Forecast</h1>
+
+ 
+
+ 
+  <div class="container">
+    <div class="search">
+      <input type="text" id="cityInput" placeholder="Enter City Name" spellcheck="false">
+      <button onclick="checkWeather()">Search</button>
+    </div>
+    <div class="weather">
+      <img src="images/clouds.png" class="weather-icon" alt="weather icon">
+      <h1 class="temp">22°C</h1>
+      <h2 class="city">City</h2>
+      <div class="details">
+        <div class="col">
+          <img src="images/humidity.png" alt="humidity icon">
+          <div>
+            <p class="humidity">--%</p>
+            <p>Humidity</p>
+          </div>
+        </div>
+        <div class="col">
+          <img src="images/wind.png" alt="wind icon">
+          <div>
+            <p class="wind">-- km/h</p>
+            <p>Wind Speed</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    const apiKey = "2a1618bff971de8745734b60b1a00693";
+    const weatherIcon = document.querySelector(".weather-icon");
+
+    async function checkWeather() {
+      const city = document.getElementById("cityInput").value.trim();
+      if (!city) return;
+
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        if (data.cod === "404") {
+          alert("City not found");
+          document.querySelector(".weather").style.display = "none";
+          return;
+        }
+
+        document.querySelector(".city").textContent = data.name;
+        document.querySelector(".temp").textContent = Math.round(data.main.temp) + "°C";
+        document.querySelector(".humidity").textContent = data.main.humidity + "%";
+        document.querySelector(".wind").textContent = data.wind.speed + " km/h";
+
+        const condition = data.weather[0].main;
+        switch (condition) {
+          case "Clouds": weatherIcon.src = "images/clouds.png"; break;
+          case "Clear": weatherIcon.src = "images/clear.png"; break;
+          case "Rain": weatherIcon.src = "images/rain.png"; break;
+          case "Drizzle": weatherIcon.src = "images/drizzle.png"; break;
+          case "Mist": weatherIcon.src = "images/mist.png"; break;
+          default: weatherIcon.src = "images/clouds.png";
+        }
+
+        document.querySelector(".weather").style.display = "block";
+
+      } catch (error) {
+        alert("Failed to fetch weather data.");
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
